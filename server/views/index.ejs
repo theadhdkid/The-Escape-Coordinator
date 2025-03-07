@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Escape Coordinator - Plan Your Perfect Trip</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Pacifico&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/styles.css">
+    <script src="/js/main.js" defer></script>
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <div class="nav-content">
+            <a href="/" class="logo">The Escape Coordinator</a>
+            <button class="nav-button" onclick="openModal()">
+                <span>+</span> New Trip
+            </button>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="trips-header">
+            <h2>Your Trips</h2>
+        </div>
+
+        <!-- Trips Grid -->
+        <div class="trips-grid">
+            <% if (trips && trips.length > 0) { %>
+                <% trips.forEach(trip => { %>
+                    <div class="trip-card" onclick="window.location.href='/trips/<%= trip.id %>'">
+                        <h3 class="trip-title"><%= trip.title %></h3>
+                        <div class="trip-info">
+                            <div class="trip-destination">
+                                <span class="icon">📍</span>
+                                <span><%= trip.destination %></span>
+                            </div>
+                            <div class="trip-dates">
+                                <span class="icon">📅</span>
+                                <span>
+                                    <%= new Date(trip.start_date).toLocaleDateString('en-US', { 
+                                        year: 'numeric', 
+                                        month: 'long', 
+                                        day: 'numeric' 
+                                    }) %> - 
+                                    <%= new Date(trip.end_date).toLocaleDateString('en-US', { 
+                                        year: 'numeric', 
+                                        month: 'long', 
+                                        day: 'numeric' 
+                                    }) %>
+                                </span>
+                            </div>
+                            <div class="trip-budget">
+                                <span class="icon">💰</span>
+                                <span>Budget: <%= trip.budget.toLocaleString('en-US', { 
+                                    style: 'currency', 
+                                    currency: 'USD' 
+                                }) %></span>
+                            </div>
+                        </div>
+                        <div class="card-actions">
+                            <button 
+                                class="card-button edit-button" 
+                                onclick="event.stopPropagation(); openEditModal(
+                                    <%= trip.id %>, 
+                                    '<%= trip.title %>', 
+                                    '<%= trip.destination %>', 
+                                    '<%= trip.start_date %>', 
+                                    '<%= trip.end_date %>', 
+                                    <%= trip.budget %>
+                                )"
+                            >
+                                Edit
+                            </button>
+                            <button 
+                                class="card-button delete-button" 
+                                onclick="event.stopPropagation(); confirmDelete(<%= trip.id %>)"
+                            >
+                                Delete
+                            </button>
+                        </div>
+                    </div>
+                <% }); %>
+            <% } else { %>
+                <div class="no-trips">
+                    <div id="no-trips-animation" style="width: 300px; height: 300px; margin: auto;"></div>
+                    <p>No trips planned yet. Click "+ <span class="highlight">New Trip</span>" to get started!</p>
+                </div>
+                <script src="https://cdnjs.cloudflare.com/ajax/libs/lottie-web/5.12.0/lottie.min.js"></script>
+                <script>
+                    document.addEventListener("DOMContentLoaded", () => {
+                        // Check if the animation container exists
+                        const animationContainer = document.getElementById('no-trips-animation');
+                        if (animationContainer) {
+                            lottie.loadAnimation({
+                                container: animationContainer, // ID of the container
+                                path: '/animations/no-trips.json', // Path to your animation JSON
+                                renderer: 'svg', // Render type (SVG for most cases)
+                                loop: true, // Make it loop continuously
+                                autoplay: true // Auto-play the animation
+                            });
+                        }
+                    });
+                </script>
+            <% } %>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <p>Created by CharZara</p>
+    </footer>
+
+    <!-- New Trip Modal -->
+    <div id="newTripModal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <h2>Create New Trip</h2>
+            <form id="newTripForm">
+                <div class="form-group">
+                    <label for="title">Trip Title</label>
+                    <input type="text" id="title" name="title" placeholder="Enter trip title" required>
+                </div>
+                <div class="form-group">
+                    <label for="destination">Destination</label>
+                    <input type="text" id="destination" name="destination" placeholder="Enter destination" required>
+                </div>
+                <div class="form-group">
+                    <label for="start_date">Start Date</label>
+                    <input type="date" id="start_date" name="start_date" required>
+                </div>
+                <div class="form-group">
+                    <label for="end_date">End Date</label>
+                    <input type="date" id="end_date" name="end_date" required>
+                </div>
+                <div class="form-group">
+                    <label for="budget">Budget ($)</label>
+                    <input type="number" id="budget" name="budget" min="0" step="0.01" placeholder="Enter budget" required>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="button-secondary" onclick="closeModal()">Cancel</button>
+                    <button type="submit" class="button-primary">Create Trip</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Edit Trip Modal -->
+    <div id="editTripModal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <h2>Edit Trip</h2>
+            <form id="editTripForm">
+                <input type="hidden" id="edit_trip_id">
+                <div class="form-group">
+                    <label for="edit_title">Trip Title</label>
+                    <input type="text" id="edit_title" name="title" placeholder="Enter trip title" required>
+                </div>
+                <div class="form-group">
+                    <label for="edit_destination">Destination</label>
+                    <input type="text" id="edit_destination" name="destination" placeholder="Enter destination" required>
+                </div>
+                <div class="form-group">
+                    <label for="edit_start_date">Start Date</label>
+                    <input type="date" id="edit_start_date" name="start_date" required>
+                </div>
+                <div class="form-group">
+                    <label for="edit_end_date">End Date</label>
+                    <input type="date" id="edit_end_date" name="end_date" required>
+                </div>
+                <div class="form-group">
+                    <label for="edit_budget">Budget ($)</label>
+                    <input type="number" id="edit_budget" name="budget" min="0" step="0.01" placeholder="Enter budget" required>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="button-secondary" onclick="closeEditModal()">Cancel</button>
+                    <button type="submit" class="button-primary">Save Changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</body>
+</html>

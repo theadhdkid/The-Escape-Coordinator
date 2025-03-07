@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trip Details - The Escape Coordinator</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Pacifico&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/styles.css">
+    <script src="/js/trip-details.js" defer></script>
+</head>
+<body>
+    <input type="hidden" id="trip_start_date" value="<%= trip.start_date %>">
+    <input type="hidden" id="trip_end_date" value="<%= trip.end_date %>">
+
+    <nav class="navbar">
+        <div class="nav-content">
+            <a href="/" class="logo">The Escape Coordinator</a>
+            <button class="nav-button" onclick="window.location.href='/'">Back to Trips</button>
+        </div>
+    </nav>
+
+    <main class="main-content">
+        <div class="trip-details-header">
+            <h2><%= trip.title %></h2>
+            <button class="nav-button" onclick="openEditTripModal()">Edit Trip</button>
+        </div>
+
+        <div class="trip-details-content">
+            <div class="trip-info-card">
+                <div class="trip-info">
+                    <div>📍 Destination: <%= trip.destination %></div>
+                    <div>📅 Dates: <%= new Date(trip.start_date).toLocaleDateString() %> - <%= new Date(trip.end_date).toLocaleDateString() %></div>
+                    <div>💰 Budget: $<%= parseFloat(trip.budget).toFixed(2) %></div>
+                </div>
+            </div>
+
+            <div class="activities-section">
+                <h3>Activities</h3>
+                <button class="nav-button" onclick="openActivityModal()">+ Add Activity</button>
+                
+                <div class="activities-list">
+                    <% if (trip.activities && trip.activities.length > 0) { %>
+                        <% trip.activities.forEach(activity => { %>
+                            <div class="activity-card">
+                                <h4><%= activity.name %></h4>
+                                <div class="activity-info">
+                                    <div>📅 <%= new Date(activity.date).toLocaleDateString() %></div>
+                                    <div>💰 $<%= parseFloat(activity.cost).toFixed(2) %></div>
+                                </div>
+                                <p><%= activity.description %></p>
+                                <div class="card-actions">
+                                    <button class="card-button" onclick="openEditActivityModal(
+                                        <%= activity.id %>,
+                                        `<%= activity.name.replace(/`/g, '\\`') %>`,
+                                        '<%= activity.date %>',
+                                        <%= activity.cost %>,
+                                        `<%= activity.description.replace(/`/g, '\\`') %>`
+                                    )">Edit</button>
+                                    <button class="card-button delete-activity-button" data-activity-id="<%= activity.id %>">Delete</button>
+                                </div>
+                            </div>
+                        <% }) %>
+                    <% } else { %>
+                        <p>No activities planned yet. Add some activities to your trip!</p>
+                    <% } %>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="footer">
+        Created by CharZara
+    </footer>
+
+    <!-- Add Activity Modal -->
+    <div id="addActivityModal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <h2>Add New Activity</h2>
+            <form id="addActivityForm">
+                <input type="hidden" id="trip_id" value="<%= trip.id %>">
+                <div class="form-group">
+                    <label for="activity_name">Activity Name</label>
+                    <input type="text" id="activity_name" name="name" placeholder="Enter activity name" required>
+                </div>
+                <div class="form-group">
+                    <label for="activity_date">Date</label>
+                    <input type="date" id="activity_date" name="date" required>
+                </div>
+                <div class="form-group">
+                    <label for="activity_cost">Cost ($)</label>
+                    <input type="number" id="activity_cost" name="cost" min="0" step="0.01" placeholder="Enter cost" required>
+                </div>
+                <div class="form-group">
+                    <label for="activity_description">Description</label>
+                    <textarea id="activity_description" name="description" rows="3" placeholder="Describe the activity" required></textarea>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="button-secondary" onclick="closeActivityModal()">Cancel</button>
+                    <button type="submit" class="button-primary">Add Activity</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Edit Activity Modal -->
+    <div id="editActivityModal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <h2>Edit Activity</h2>
+            <form id="editActivityForm">
+                <input type="hidden" id="edit_activity_id">
+                <div class="form-group">
+                    <label for="edit_activity_name">Activity Name</label>
+                    <input type="text" id="edit_activity_name" name="name" placeholder="Enter activity name" required>
+                </div>
+                <div class="form-group">
+                    <label for="edit_activity_date">Date</label>
+                    <input type="date" id="edit_activity_date" name="date" required>
+                </div>
+                <div class="form-group">
+                    <label for="edit_activity_cost">Cost ($)</label>
+                    <input type="number" id="edit_activity_cost" name="cost" min="0" step="0.01" placeholder="Enter cost" required>
+                </div>
+                <div class="form-group">
+                    <label for="edit_activity_description">Description</label>
+                    <textarea id="edit_activity_description" name="description" rows="3" placeholder="Describe the activity" required></textarea>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="button-secondary" onclick="closeEditActivityModal()">Cancel</button>
+                    <button type="submit" class="button-primary">Save Changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</body>
+</html>
