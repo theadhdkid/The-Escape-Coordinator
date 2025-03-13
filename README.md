@@ -80,11 +80,6 @@ This project is **deployed on Railway**. To deploy:
 railway up
 ```
 
-## Future Improvements
-- **Google Maps API Integration** for location-based trip planning.
-- **Multi-user collaboration** for shared trip planning.
-- **Expense splitting feature** to divide costs among travelers.
-
 ## Author
 **Anzara** - Developed the entire project, including **frontend, backend, database design, and deployment**.
 
